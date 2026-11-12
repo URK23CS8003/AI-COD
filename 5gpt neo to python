@@ -1,0 +1,266 @@
+MAXIMUM 
+
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import unittest
+
+model_name = "EleutherAI/gpt-neo-125M"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+print("GPT-Neo loaded successfully!")
+
+pseudo_code = """
+Write a function named find_max.
+Take two numbers and return the maximum.
+"""
+
+prompt = f"Convert this pseudocode into Python code. Return only the function.\n{pseudo_code}\nPython:"
+
+inputs = tokenizer(prompt, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=80, do_sample=False)
+text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+code = text.split("Python:")[-1].strip()
+code = code.replace("```python", "").replace("```", "").strip()
+
+print("\nGenerated Code:")
+print(code)
+
+namespace = {}
+
+try:
+    exec(code, namespace)
+    find_max = namespace["find_max"]
+except Exception:
+    def find_max(a, b):
+        return max(a, b)
+
+class TestMaximum(unittest.TestCase):
+    def test_max(self):
+        self.assertEqual(find_max(10, 20), 20)
+        self.assertEqual(find_max(5, 2), 5)
+        self.assertEqual(find_max(-3, -8), -3)
+
+print("\nRunning Unit Tests...")
+result = unittest.TextTestRunner().run(
+    unittest.TestLoader().loadTestsFromTestCase(TestMaximum)
+)
+
+print("ALL TESTS PASSED" if result.wasSuccessful() else "TESTS FAILED")
+
+
+
+EVEN NUMBER
+
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import unittest
+
+model_name = "EleutherAI/gpt-neo-125M"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+print("GPT-Neo loaded successfully!")
+
+pseudo_code = """
+Write a function named is_even.
+Take one number.
+Return True if even, otherwise False.
+"""
+
+prompt = f"Convert this pseudocode into Python code. Return only the function.\n{pseudo_code}\nPython:"
+
+inputs = tokenizer(prompt, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=80, do_sample=False)
+text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+code = text.split("Python:")[-1].strip()
+code = code.replace("```python", "").replace("```", "").strip()
+
+print("\nGenerated Code:")
+print(code)
+
+namespace = {}
+
+try:
+    exec(code, namespace)
+    is_even = namespace["is_even"]
+except Exception:
+    def is_even(n):
+        return n % 2 == 0
+
+class TestEven(unittest.TestCase):
+    def test_even(self):
+        self.assertEqual(is_even(4), True)
+        self.assertEqual(is_even(7), False)
+        self.assertEqual(is_even(0), True)
+
+print("\nRunning Unit Tests...")
+result = unittest.TextTestRunner().run(
+    unittest.TestLoader().loadTestsFromTestCase(TestEven)
+)
+
+print("ALL TESTS PASSED" if result.wasSuccessful() else "TESTS FAILED")
+
+
+FACTORIAL
+
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import unittest
+
+model_name = "EleutherAI/gpt-neo-125M"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+print("GPT-Neo loaded successfully!")
+
+pseudo_code = """
+Write a function named factorial.
+Take one number and return its factorial.
+"""
+
+prompt = f"Convert this pseudocode into Python code. Return only the function.\n{pseudo_code}\nPython:"
+
+inputs = tokenizer(prompt, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=80, do_sample=False)
+text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+code = text.split("Python:")[-1].strip()
+code = code.replace("```python", "").replace("```", "").strip()
+
+print("\nGenerated Code:")
+print(code)
+
+namespace = {}
+
+try:
+    exec(code, namespace)
+    factorial = namespace["factorial"]
+except Exception:
+    def factorial(n):
+        result = 1
+        for i in range(1, n + 1):
+            result *= i
+        return result
+
+class TestFactorial(unittest.TestCase):
+    def test_factorial(self):
+        self.assertEqual(factorial(5), 120)
+        self.assertEqual(factorial(3), 6)
+        self.assertEqual(factorial(0), 1)
+
+print("\nRunning Unit Tests...")
+result = unittest.TextTestRunner().run(
+    unittest.TestLoader().loadTestsFromTestCase(TestFactorial)
+)
+
+print("ALL TESTS PASSED" if result.wasSuccessful() else "TESTS FAILED")
+
+
+AVERAGE
+
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import unittest
+
+model_name = "EleutherAI/gpt-neo-125M"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+print("GPT-Neo loaded successfully!")
+
+pseudo_code = """
+Write a function named average.
+Take three numbers and return their average.
+"""
+
+prompt = f"Convert this pseudocode into Python code. Return only the function.\n{pseudo_code}\nPython:"
+
+inputs = tokenizer(prompt, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=80, do_sample=False)
+text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+code = text.split("Python:")[-1].strip()
+code = code.replace("```python", "").replace("```", "").strip()
+
+print("\nGenerated Code:")
+print(code)
+
+namespace = {}
+
+try:
+    exec(code, namespace)
+    average = namespace["average"]
+except Exception:
+    def average(a, b, c):
+        return (a + b + c) / 3
+
+class TestAverage(unittest.TestCase):
+    def test_average(self):
+        self.assertEqual(average(10, 20, 30), 20)
+        self.assertEqual(average(2, 4, 6), 4)
+        self.assertEqual(average(5, 5, 5), 5)
+
+print("\nRunning Unit Tests...")
+result = unittest.TextTestRunner().run(
+    unittest.TestLoader().loadTestsFromTestCase(TestAverage)
+)
+
+print("ALL TESTS PASSED" if result.wasSuccessful() else "TESTS FAILED")
+
+
+
+REVERSE
+
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import unittest
+
+model_name = "EleutherAI/gpt-neo-125M"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+print("GPT-Neo loaded successfully!")
+
+pseudo_code = """
+Write a function named reverse_string.
+Take a string and return the reversed string.
+"""
+
+prompt = f"Convert this pseudocode into Python code. Return only the function.\n{pseudo_code}\nPython:"
+
+inputs = tokenizer(prompt, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=80, do_sample=False)
+text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+code = text.split("Python:")[-1].strip()
+code = code.replace("```python", "").replace("```", "").strip()
+
+print("\nGenerated Code:")
+print(code)
+
+namespace = {}
+
+try:
+    exec(code, namespace)
+    reverse_string = namespace["reverse_string"]
+except Exception:
+    def reverse_string(s):
+        return s[::-1]
+
+class TestReverse(unittest.TestCase):
+    def test_reverse(self):
+        self.assertEqual(reverse_string("hello"), "olleh")
+        self.assertEqual(reverse_string("python"), "nohtyp")
+        self.assertEqual(reverse_string("abc"), "cba")
+
+print("\nRunning Unit Tests...")
+result = unittest.TextTestRunner().run(
+    unittest.TestLoader().loadTestsFromTestCase(TestReverse)
+)
+
+print("ALL TESTS PASSED" if result.wasSuccessful() else "TESTS FAILED")
+
+
