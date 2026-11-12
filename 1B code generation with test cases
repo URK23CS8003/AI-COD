@@ -1,0 +1,60 @@
+
+import ollama
+
+def generate_function(description):
+    prompt = f"Write a Python function based on this description: {description}. Return only code."
+    response = ollama.chat(model="llama3", messages=[
+        {"role": "user", "content": prompt}
+    ])
+    return response["message"]["content"].strip().replace("```python", "").replace("```", "").strip()
+
+
+def execute_function(code, name, tests):
+    try:
+        env = {}
+        exec(code, env)
+        func = env[name]
+        results = []
+
+        for inputs, expected in tests:
+            try:
+                output = func(*inputs)
+                results.append((inputs, output, expected, output == expected))
+            except Exception as e:
+                results.append((inputs, str(e), expected, False))
+
+        return results
+
+    except Exception as e:
+        return [("Compilation Error", str(e), None, False)]
+
+
+def main():
+    description = "Write a function named n_nat_numbers that returns numbers from 0 to given number as a list."
+
+    print("Description:", description)
+
+    code = generate_function(description)
+    print("\nGenerated Function:\n", code)
+
+    tests = [
+        ((0,), [0]),
+        ((1,), [0, 1]),
+        ((3,), [0, 1, 2, 3]),
+        ((5,), [0, 1, 2, 3, 4, 5]),
+        ((10,), list(range(11)))
+    ]
+
+    print("\nExecuting Tests...")
+
+    results = execute_function(code, "n_nat_numbers", tests)
+
+    for inputs, output, expected, passed in results:
+        print("PASS" if passed else "FAIL",
+              "| Input:", inputs,
+              "| Output:", output,
+              "| Expected:", expected)
+
+
+if __name__ == "__main__":
+    main()
