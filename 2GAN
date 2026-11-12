@@ -1,0 +1,142 @@
+
+import ollama
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+MODEL = "codellama"
+
+real_codes = [
+"""def bubble_sort(a):
+    for i in range(len(a)):
+        for j in range(len(a)-i-1):
+            if a[j] > a[j+1]:
+                a[j], a[j+1] = a[j+1], a[j]
+    return a""",
+
+"""def insertion_sort(a):
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i-1
+        while j >= 0 and a[j] > key:
+            a[j+1] = a[j]
+            j -= 1
+        a[j+1] = key
+    return a""",
+
+"""def selection_sort(a):
+    for i in range(len(a)):
+        m = i
+        for j in range(i+1, len(a)):
+            if a[j] < a[m]:
+                m = j
+        a[i], a[m] = a[m], a[i]
+    return a""",
+
+"""def linear_search(a, x):
+    for i in range(len(a)):
+        if a[i] == x:
+            return i
+    return -1""",
+
+"""def binary_search(a, x):
+    l, r = 0, len(a)-1
+    while l <= r:
+        m = (l+r)//2
+        if a[m] == x:
+            return m
+        elif a[m] < x:
+            l = m+1
+        else:
+            r = m-1
+    return -1""",
+
+"""def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n-1)""",
+
+"""def fibonacci(n):
+    a, b = 0, 1
+    result = []
+    for i in range(n):
+        result.append(a)
+        a, b = b, a+b
+    return result""",
+
+"""def is_palindrome(s):
+    return s == s[::-1]"""
+]
+
+prompts = [
+    "Write a Python bubble sort function.",
+    "Write a Python insertion sort function.",
+    "Write a Python selection sort function.",
+    "Write a Python linear search function.",
+    "Write a Python binary search function.",
+    "Write a Python factorial function.",
+    "Write a Python fibonacci function.",
+    "Write a Python palindrome checking function."
+]
+
+generated_codes = []
+
+print("Generating Python code using CodeLlama...")
+
+for prompt in prompts:
+    result = ollama.generate(
+        model=MODEL,
+        prompt=prompt,
+        options={"temperature": 0.7}
+    )
+
+    code = result.response.strip()
+    code = re.sub(r"^```(?:python)?\s*|\s*```$", "", code,
+                  flags=re.IGNORECASE)
+    generated_codes.append(code)
+
+    print("Generated:", prompt)
+
+X = real_codes + generated_codes
+y = [1] * len(real_codes) + [0] * len(generated_codes)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y
+)
+
+vectorizer = TfidfVectorizer(analyzer="char", ngram_range=(2, 5))
+X_train = vectorizer.fit_transform(X_train)
+X_test = vectorizer.transform(X_test)
+
+discriminator = LogisticRegression(max_iter=1000)
+discriminator.fit(X_train, y_train)
+
+predictions = discriminator.predict(X_test)
+
+accuracy = accuracy_score(y_test, predictions)
+
+print("\nDiscriminator Training Completed")
+print("Accuracy:", round(accuracy * 100, 2), "%")
+
+print("\nEvaluation Results:")
+
+for code, actual, predicted in zip(X_test.toarray(), y_test, predictions):
+    label = "Real" if predicted == 1 else "Generated"
+    print("Actual:", actual, "| Prediction:", predicted, label)
+
+print("\nSample Predictions:")
+
+samples = [real_codes[0], generated_codes[0]]
+sample_names = ["REAL", "GENERATED"]
+
+for name, code in zip(sample_names, samples):
+    features = vectorizer.transform([code])
+    prediction = discriminator.predict(features)[0]
+    confidence = max(discriminator.predict_proba(features)[0])
+
+    print("\n[" + name + "]")
+    print(code[:200])
+    print("Prediction:", prediction)
+    print("Confidence:", round(confidence, 2))
